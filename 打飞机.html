@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <style>
+        *{
+            margin:0;
+            padding:0;
+        }
+        #score{
+            position: absolute;
+            right:0;
+            top:0;
+            z-index:2;
+            font-size:25px;
+
+        }
+        #gg{
+            position: absolute;
+            top:50%;
+            left:50%;
+            transform: translate(-50%,-50%);
+            display: none;
+        }
+        #gg h1{
+            font-size:20px;
+        }
+        #gg p{
+
+            position: absolute;
+            top:90%;
+            left:50%;
+            transform: translate(-50%);
+            font-size:15px;
+        }
+       #loading{
+            width:100%;
+            height:100%;
+            z-index:99999;
+            background-color:#ccc;
+            position:fixed;
+            font-size:30px;
+        }
+        #loadText{
+            color:#000;
+            position:absolute;
+            left:50%;
+            top:50%;
+            -webkit-transform:translate(-50%,-50%); -moz-transform:translate(-50%,-50%); -ms-transform:translate(-50%,-50%); -o-transform:translate(-50%,-50%); transform:translate(-50%,-50%);
+        }
+
+    </style>
+    <script src="loading.js"></script>
+    <script type="text/javascript">
+        window.onload = function () {
+            var loads = document.getElementById("loading");
+            var loadText = document.getElementById("loadText");
+          var canvas = document.getElementById("canvas");
+          var ctx = canvas.getContext("2d");
+            canvas.width = document.documentElement.clientWidth;
+            canvas.height = document.documentElement.clientHeight;
+            loading({
+                        "background_2": "img/background_2.png",
+                        "bg1": "img/bg1.png",
+                        "bomb": "img/bomb.png",
+                        "bullet1": "img/bullet1.png",
+                        "bullet2": "img/bullet2.png",
+                        "enemy1_blowup_1": "img/enemy1_blowup_1.png",
+                        "enemy1_blowup_2": "img/enemy1_blowup_2.png",
+                        "enemy1_blowup_3": "img/enemy1_blowup_3.png",
+                        "enemy1_blowup_4": "img/enemy1_blowup_4.png",
+                        "enemy1_fly_1": "img/enemy1_fly_1.png",
+                        "enemy2_blowup_1": "img/enemy2_blowup_1.png",
+                        "enemy2_blowup_2": "img/enemy2_blowup_2.png",
+                        "enemy2_blowup_3": "img/enemy2_blowup_3.png",
+                        "enemy2_blowup_4": "img/enemy2_blowup_4.png",
+                        "enemy2_blowup_5": "img/enemy2_blowup_5.png",
+                        "enemy2_blowup_6": "img/enemy2_blowup_6.png",
+                        "enemy2_blowup_7": "img/enemy2_blowup_7.png",
+                        "enemy2_fly_1": "img/enemy2_fly_1.png",
+                        "enemy2_fly_2": "img/enemy2_fly_2.png",
+                        "enemy2_hit_1": "img/enemy2_hit_1.png",
+                        "enemy3_blowup_1": "img/enemy3_blowup_1.png",
+                        "enemy3_blowup_2": "img/enemy3_blowup_2.png",
+                        "enemy3_blowup_3": "img/enemy3_blowup_3.png",
+                        "enemy3_blowup_4": "img/enemy3_blowup_4.png",
+                        "enemy3_fly_1": "img/enemy3_fly_1.png",
+                        "enemy3_hit_1": "img/enemy3_hit_1.png",
+                        "enemy3_hit_2": "img/enemy3_hit_2.png",
+                        "enemy4_fly_1": "img/enemy4_fly_1.png",
+                        "enemy5_fly_1": "img/enemy5_fly_1.png",
+                        "gameArts-hd": "img/gameArts-hd.png",
+                        "gameArts": "img/gameArts.png",
+                        "game_pause": "img/game_pause.png",
+                        "game_pause_hl": "img/game_pause_hl.png",
+                        "hero_blowup_1": "img/hero_blowup_1.png",
+                        "hero_blowup_2": "img/hero_blowup_2.png",
+                        "hero_blowup_3": "img/hero_blowup_3.png",
+                        "hero_blowup_4": "img/hero_blowup_4.png",
+                        "hero_fly_1": "img/hero_fly_1.png",
+                        "hero_fly_2": "img/hero_fly_2.png",
+                        "loading0": "img/loading0.png",
+                        "loading1": "img/loading1.png",
+                        "loading2": "img/loading2.png",
+                        "loading3": "img/loading3.png"
+                    }
+                    , function (a) {
+                        //图片加载的进度
+                        console.log(a);
+                        loadText.innerHTML = a;
+
+                    }, main);
+            var bulletM = document.getElementById("bulletM");
+            var enemy1M = document.getElementById("enemy1M");
+            var enemy2M = document.getElementById("enemy2M");
+            var enemy3M = document.getElementById("enemy3M");
+            var gameoverM = document.getElementById("gameoverM");
+
+             var score = document.getElementById("score");
+            var p = document.getElementById("p");
+            var gg =document.getElementById("gg");
+            var scores = 0;
+            var timer = 0;
+            function main(imgObj) {
+                timer++;
+            bulletM.play();
+                //图片加载完成
+//                    console.log(a.bullet1);
+//                    console.log(a["bullet2"]);
+                loads.style.display = "none";
+
+
+
+/*********************************************飞机*********************************************/
+
+                var hero = {
+                    img:imgObj.hero_fly_1,
+                    x:canvas.width/2 - imgObj.hero_fly_1.width/2,
+                    y:canvas.height - imgObj.hero_fly_1.height - 20,
+                    w:imgObj.hero_fly_1.width,
+                    h:imgObj.hero_fly_1.height,
+                    canDeath:false,
+                    index:4,
+                    count:1,
+                    gameOver:false,
+                    direction:"right"
+                };
+                hero.draw = function () {
+                    ctx.drawImage(this.img,this.x,this.y,this.w,this.h);
+                };
+                hero.boom = function () {
+                    if(this.canDeath){
+                        this.img = imgObj["hero_blowup_"+this.count];
+                        this.count++;
+                        if(this.count == this.index+1){
+//                            alert("death");
+                            this.gameOver = true;
+                        }
+                    }
+                };
+
+
+/*********************************************子弹*********************************************/
+                //子弹
+                function Bullet() {
+                    this.img = imgObj.bullet1;
+                    this.w = this.img.width;
+                    this.h = this.img.height;
+                    this.x = hero.x+hero.w/2-this.w/2;
+                    this.y = hero.y - this.h;
+                    this.speed = 5;
+                    this.power = 1;
+
+                }
+                //用来存放子弹的容器（数组）
+                var bullets = [];
+                Bullet.prototype.draw = function () {
+                    ctx.drawImage(this.img,this.x,this.y,this.w,this.h);
+                }
+                Bullet.prototype.move = function () {
+                    this.y-=this.speed;
+                }
+                //判断子弹超出屏幕后从数组中删除掉
+                Bullet.prototype.canClear = function () {
+
+                    return this.y<=-this.h;
+                }
+                Bullet.prototype.crash = function () {
+                    return this.x==enemys.x&&this.y==enemys.y;
+                }
+
+
+
+
+/*********************************************敌机*********************************************/
+                function rand(min,max) {
+                    return Math.floor(Math.random()*(max-min+1)+min);
+                }
+                function Enemy() {
+                    this.img =  imgObj.enemy1_fly_1;
+                    this.w = this.img.width;
+                    this.h = this.img.height;
+                    this.x = rand(0,canvas.width-this.w);
+                    this.y = -this.h;
+                    this.speed = 6;
+                    //飞机类型,  0,1,2
+                    this.type = 1;
+                    //飞机爆炸图片的的个数
+                    this.count = 4;
+                    //表示飞机被子弹打中时
+                    this.canDeath = false;
+                    //表示爆炸动画中当前的图片下标
+                    this.currentIndex = 1;
+                    this.blood = 1;
+                    this.fuck=1;
+                    this.nuclear = 4;
+                }
+                Enemy.prototype.draw = function () {
+                    ctx.drawImage(this.img,this.x,this.y,this.w,this.h);
+                }
+                Enemy.prototype.move = function () {
+                    this.y+=this.speed;
+                }
+                Enemy.prototype.canClear = function () {
+                    return this.y>=canvas.height;
+                }
+                //飞机改变类型
+                Enemy.prototype.changeType = function (type) {
+                    this.type = type;
+                    switch(this.type){
+                        case 1:
+                                break;
+                        case 2:
+                                this.img = imgObj.enemy2_fly_1;
+                                this.w = this.img.width;
+                                this.h = this.img.height;
+                                this.y = -this.h;
+                                this.x = rand(0,canvas.width - this.w);
+                                this.count = 7;
+                                this.blood = 8;
+                                this.speed = 3;
+                                this.fuck = 10;
+
+                                this.nuclear = 4;
+
+                                break;
+                        case 3:
+                                this.img = imgObj.enemy3_fly_1;
+                                this.w = this.img.width;
+                                this.h = this.img.height;
+                                this.count = 4;
+                                //表示飞机爆炸图片显示完，飞机应该被删除
+                                this.death = false;
+                                this.blood = 3;
+                                this.speed = 5;
+                                this.fuck = 5;
+                                this.nuclear = 2;
+                                break;
+                    }
+                }
+                Enemy.prototype.boom = function () {
+                    if(this.canDeath){
+                        this.img = imgObj["enemy"+this.type+"_blowup_"+this.currentIndex];
+                        this.currentIndex++;
+                        if(this.currentIndex==this.count+1 ){
+                            this.death = true;
+//                            "enemy"+currentIndex+"M".play();
+
+                            scores+=this.fuck;
+                            score.innerHTML = scores;
+                            if(this.nuclear>3){
+                                ctx.drawImage(imgObj.bomb,0,0,imgObj.width,imgObj.height);
+                            }
+                        }
+                    }
+
+                }
+                //用来存放所有的敌机
+                var enemys = [];
+
+
+                function checkP(obj1, obj2) {
+                    //x轴方向最小距离
+                    var disX = obj1.w/2 + obj2.w/2;
+                    //y轴
+                    var disY = obj1.h/2 + obj2.h/2;
+
+                    //两个矩形x轴方向实际的中心距
+                    var realX = Math.abs((obj1.x + obj1.w/2) - (obj2.x + obj2.w/2));
+                    //y轴
+                    var realY = Math.abs((obj1.y + obj1.h/2) - (obj2.y + obj2.h/2));
+
+                    if (realX <= disX && realY <= disY) {
+                        return true;
+                    }else {
+                        return false;
+                    }
+                }
+/*********************************************画布运动*********************************************/
+                //touchmove的开关
+                var canMove = false;
+                var scrollY = 0;
+                var time = 0;
+                function run() {
+                    ctx.clearRect(0,0,canvas.width,canvas.height);
+                    scrollY++;
+                    time++;
+
+                    if(scrollY == canvas.height){
+                    scrollY = 0;
+                    }
+
+                    //1.画背景
+                    var a = imgObj.bg1;
+                    ctx.drawImage(a,0,scrollY-canvas.height,canvas.width,canvas.height);
+                    ctx.drawImage(a,0,scrollY,canvas.width,canvas.height);
+                    //2.画飞机
+                    if(time%15 == 0){
+                        hero.img = imgObj.hero_fly_1;
+                    }else{
+                        hero.img = imgObj.hero_fly_2;
+                    }
+                    hero.boom();
+                    hero.draw();
+                    //3.画子弹
+                    if(time%12==0){
+                    var bullet = new Bullet();
+                        bullets.push(bullet);
+                    }
+                    for(var i = 0;i<bullets.length;i++){
+                        var bullet = bullets[i];
+                        bullet.draw();
+                        bullet.move();
+                        if(bullet.canClear()){
+                            bullets.splice(i,1);
+                        }
+
+                    }
+
+                    //4.画敌机
+                    if(time%30==0){
+                        var enemy = new Enemy();
+                        enemys.push(enemy);
+                        if(time%7==0){
+                            enemy.changeType(2);
+                        }else if(time%50==0){
+                        enemy.changeType(3);
+                        }
+                    }
+                    for(var i = 0;i<enemys.length;i++){
+                        var enemy = enemys[i];
+                        enemy.draw();
+                        enemy.move();
+                        if(time%2==0){
+                            enemy.boom();
+                        }
+
+
+                        //两种情况飞机被删除  1.飞机超出屏幕
+//                                         2.飞机爆炸动画走完
+                        if(enemy.canClear()||enemy.death){
+                        enemys.splice(i,1);
+                   //敌机从数组中删掉后，数组的长度也会相应的-1，此时数组中后面的对象的下标都会小1，如果不i--的话，后续的下标就会错一位
+                        i--;
+                        }
+                    }
+//                    5.判断子弹与敌机碰撞
+                        for(var i = 0;i<bullets.length;i++){
+                            for(var j = 0;j<enemys.length;j++){
+                                if(checkP(bullets[i],enemys[j])){
+                                    enemys[j].blood -= bullets[i].power;
+                                    if(enemys[j].blood == 0){
+                                        enemys[j].canDeath = true;
+                                    }
+                                    bullets.splice(i,1);
+                                    break;
+                                }
+                            }
+                        }
+                      //6.敌机与本机
+                    for(var i = 0;i<enemys.length;i++){
+                        if(checkP(hero,enemys[i])){
+                            hero.canDeath = true;
+                        }
+                    }
+                        if(!hero.gameOver){
+                            window.requestAnimationFrame(run);
+
+                        }
+                        if(hero.gameOver){
+                            gg.style.display= "block";
+                            gameoverM.play();
+                            bulletM.pause();
+                            p.onclick = function () {
+                                gg.style.display = "none";
+                                main(imgObj);
+                                hero.gameOver = false;
+//                                ctx.clearRect(0,0,canvas.width,canvas.height);
+                                window.requestAnimationFrame(run);
+                               enemys = [];
+                                bullets = [];
+                                scores = 0;
+                                score.innerHTML = "0";
+                            }
+                        }
+                }
+                run();
+/*********************************************绑定touch事件*********************************************/
+                var oldX,oldY;
+                document.addEventListener("touchstart",function(ev){
+
+                    var touch = ev.touches[0];
+                    //判断是否点到飞机
+                    if(touch.clientX>=hero.x&&touch.clientX<=hero.w+hero.x&&touch.clientY>=hero.y&&touch.clientY<=hero.y+hero.h){
+                        canMove = true;
+                        oldX = touch.clientX-hero.x;
+                        oldY = touch.clientY-hero.y;
+                        document.addEventListener("touchmove",function (e) {
+                            if(canMove){
+                                var touch = e.touches[0];
+                                hero.x = touch.clientX-oldX;
+                                hero.y = touch.clientY-oldY;
+
+                                if(hero.x<=0){
+                                    hero.x=0;
+                                }
+                                if(hero.x>=canvas.width-hero.w){
+                                    hero.x = canvas.width-hero.w;
+                                }
+                                if(hero.y<=0){
+                                    hero.y=0;
+                                }
+                                if(hero.y>=canvas.height-hero.h){
+                                    hero.y=canvas.height-hero.h;
+                                }
+
+                            }
+
+                        })
+
+                        document.addEventListener("touchend",function () {
+                            canMove = false;
+                        })
+                    }
+
+
+                },false);
+            }
+            //阻止touchmove的默认时间，防止页面可以拖动
+            document.addEventListener("touchmove",function (e) {
+                e.preventDefault();
+            })
+        }
+    </script>
+</head>
+<body>
+<div id="loading">
+    <p id="loadText">loading...</p>
+</div>
+<canvas id = "canvas" width ="500" height ="500">您的浏览器不支持</canvas>
+<div id="score">0</div>
+<div id="gg">
+    <h1>Game over</h1>
+    <p id="p">Restart</p>
+</div>
+<audio id="bulletM" src="img/bullet.mp3" loop></audio>
+
+<audio id="gameoverM" src="img/game_over.mp3"></audio>
+</body>
+</html>
